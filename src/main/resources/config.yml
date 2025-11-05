@@ -5,7 +5,17 @@
 #  - HIDE (Hides the provided commands from tab complete, but doesn't block them)
 Mode: BLACKLIST
 
+# Message displayed in chat informing the player that the command has been blocked. Leave blank to disable.
 Message: "<red><bold>Error</bold> <dark_gray>» <red>You do not have access to that command."
+
+# Message displayed in the action bar informing the player that the command has been blocked. Leave blank to disable.
+ActionBar: ""
+
+# Plays a sound when the command has been blocked. Delete this section to disable it.
+Sound:
+  Sound: ENTITY_ENDERMAN_TELEPORT # Sound to be played. You can find a full list here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+  Pitch: 0.5 # Pitch of the sound. Range: 0.0 - 1.0
+  Volume: 1.0 # Volume of the ound. Range: 0.0 - 1.0
 
 # The list of commands the plugin should look for.
 Commands:

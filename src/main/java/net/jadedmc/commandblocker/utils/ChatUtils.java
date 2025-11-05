@@ -90,6 +90,15 @@ public class ChatUtils {
     }
 
     /**
+     * Gets a copy of the current adventure object.
+     * Temporary fix for multi-version action bars.
+     * @return BukkitAudiences.
+     */
+    public static BukkitAudiences getAdventure() {
+        return adventure;
+    }
+
+    /**
      * Translates a String to a colorful String using methods in the BungeeCord API.
      * @param message Message to translate.
      * @return Translated Message.

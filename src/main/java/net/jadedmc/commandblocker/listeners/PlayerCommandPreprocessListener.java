@@ -26,6 +26,7 @@ package net.jadedmc.commandblocker.listeners;
 
 import net.jadedmc.commandblocker.CommandBlockerPlugin;
 import net.jadedmc.commandblocker.utils.ChatUtils;
+import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -64,13 +65,13 @@ public class PlayerCommandPreprocessListener implements Listener {
             return;
         }
 
+        //  Identify the command being blocked.
         final String command = event.getMessage().split(" ")[0];
 
         if(mode.equalsIgnoreCase("blacklist")) {
             for(final String blacklist : plugin.getConfigManager().getCommands()) {
                 if(command.equalsIgnoreCase(blacklist)) {
-                    ChatUtils.chat(event.getPlayer(), plugin.getConfigManager().getConfig().getString("Message"));
-                    event.setCancelled(true);
+                    blockCommand(event);
                     break;
                 }
 
@@ -80,8 +81,7 @@ public class PlayerCommandPreprocessListener implements Listener {
 
                     if(fullCommand.startsWith(blacklist.toLowerCase())) {
                         if(fullCommand.equalsIgnoreCase(blacklist) || fullCommand.startsWith(blacklist.toLowerCase() + " ")) {
-                            ChatUtils.chat(event.getPlayer(), plugin.getConfigManager().getConfig().getString("Message"));
-                            event.setCancelled(true);
+                            blockCommand(event);
                             break;
                         }
                     }
@@ -95,8 +95,36 @@ public class PlayerCommandPreprocessListener implements Listener {
                 }
             }
 
+            blockCommand(event);
+        }
+    }
+
+    /**
+     * Blocks the command, and displays block notifications.
+     * @param event PlayerCommandPreprocessEvent
+     */
+    private void blockCommand(@NotNull final PlayerCommandPreprocessEvent event) {
+        // Prevent the command from being sent.
+        event.setCancelled(true);
+
+        // Send the block message if enabled.
+        if(plugin.getConfigManager().getConfig().isSet("Message") && !plugin.getConfigManager().getConfig().getString("Message").isEmpty()) {
             ChatUtils.chat(event.getPlayer(), plugin.getConfigManager().getConfig().getString("Message"));
-            event.setCancelled(true);
+        }
+
+        // Send the block action bar if enabled.
+        if(plugin.getConfigManager().getConfig().isSet("ActionBar") && !plugin.getConfigManager().getConfig().getString("ActionBar").isEmpty()) {
+            ChatUtils.getAdventure().player(event.getPlayer()).sendActionBar(ChatUtils.translate(plugin.getConfigManager().getConfig().getString("ActionBar")));
+        }
+
+        // Play the block sound if enabled.
+        if(plugin.getConfigManager().getConfig().isSet("Sound.Sound")) {
+            final Sound sound = Sound.valueOf(plugin.getConfigManager().getConfig().getString("Sound.Sound"));
+            final float volume = (float) plugin.getConfigManager().getConfig().getDouble("Sound.Volume");
+            final float pitch = (float) plugin.getConfigManager().getConfig().getDouble("Sound.Pitch");
+
+            // Plays the sound.
+            event.getPlayer().playSound(event.getPlayer(), sound, volume, pitch);
         }
     }
 }
