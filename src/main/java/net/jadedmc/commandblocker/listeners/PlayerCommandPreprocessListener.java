@@ -28,6 +28,7 @@ import net.jadedmc.commandblocker.CommandBlockerPlugin;
 import net.jadedmc.commandblocker.utils.ChatUtils;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +52,7 @@ public class PlayerCommandPreprocessListener implements Listener {
      * Runs when the event is called.
      * @param event PlaceCommandPreprocessEvent.
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onCommandPreprocess(@NotNull final PlayerCommandPreprocessEvent event) {
         final String mode = plugin.getConfigManager().getConfig().getString("Mode");
 
