@@ -27,11 +27,14 @@ package net.jadedmc.commandblocker.listeners;
 import net.jadedmc.commandblocker.CommandBlockerPlugin;
 import net.jadedmc.commandblocker.utils.ChatUtils;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
 
 /**
  * Listens to the PlaceCommandPreprocessEvent, which runs when a player goes to send a command.
@@ -109,8 +112,15 @@ public class PlayerCommandPreprocessListener implements Listener {
         event.setCancelled(true);
 
         // Send the block message if enabled.
-        if(plugin.getConfigManager().getConfig().isSet("Message") && !plugin.getConfigManager().getConfig().getString("Message").isEmpty()) {
-            ChatUtils.chat(event.getPlayer(), plugin.getConfigManager().getConfig().getString("Message"));
+        if(plugin.getConfigManager().getConfig().isSet("Message")) {
+            final String message = plugin.getConfigManager().getConfig().getString("Message");
+
+            if(message != null && !message.isEmpty()) {
+                ChatUtils.chat(event.getPlayer(), message);
+            }
+            else if(message != null) {
+                sendUnknownCommandMessage(event.getPlayer());
+            }
         }
 
         // Send the block action bar if enabled.
@@ -127,5 +137,24 @@ public class PlayerCommandPreprocessListener implements Listener {
             // Plays the sound.
             event.getPlayer().playSound(event.getPlayer(), sound, volume, pitch);
         }
+    }
+
+    private void sendUnknownCommandMessage(@NotNull final Player player) {
+        String message = null;
+
+        try {
+            final Class<?> spigotConfig = Class.forName("org.spigotmc.SpigotConfig");
+            final Field field = spigotConfig.getDeclaredField("unknownCommandMessage");
+            message = (String) field.get(null);
+        }
+        catch (ReflectiveOperationException ignored) {
+            // Falls back to the vanilla default when server config access is unavailable.
+        }
+
+        if(message == null || message.isEmpty()) {
+            message = "Unknown command. Type \"/help\" for help.";
+        }
+
+        ChatUtils.chat(player, message);
     }
 }
