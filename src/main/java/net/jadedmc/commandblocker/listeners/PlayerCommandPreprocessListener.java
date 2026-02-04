@@ -115,7 +115,7 @@ public class PlayerCommandPreprocessListener implements Listener {
         if(plugin.getConfigManager().getConfig().isSet("Message")) {
             final String message = plugin.getConfigManager().getConfig().getString("Message");
 
-            if(message != null && !message.isEmpty()) {
+            if(message != null && !message.trim().isEmpty()) {
                 ChatUtils.chat(event.getPlayer(), message);
             }
             else if(message != null) {
